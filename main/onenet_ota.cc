@@ -49,12 +49,11 @@ std::unique_ptr<Http> OnenetOta::SetupHttp() {
 
 
 bool OnenetOta::ReportVersion() {
-    ESP_LOGE(TAG, "CurrentOneNetVersion: %s", APP_VERSION);
+    ESP_LOGI(TAG, "ReportVersion: current oneNet version: %s", APP_VERSION);
     std::string url = "https://iot-api.heclouds.com/fuse-ota/" + product_id_ + "/" + device_id_ + "/version";
     auto http = SetupHttp();
 
     std::string data = "{\"s_version\":\"" + std::string(APP_VERSION) + "\",\"f_version\":\"1.0.0\"}";
-    ESP_LOGE(TAG, "ReportVersion: %s", data.c_str());
     http->SetContent(std::move(data));
 
     if (!http->Open("POST", url)) {
@@ -69,7 +68,7 @@ bool OnenetOta::ReportVersion() {
     }
 
     data = http->ReadAll();
-    ESP_LOGE(TAG, "GetRequest: %s", data.c_str());
+    ESP_LOGD(TAG, "GetRequest: %s", data.c_str());
 
     http->Close();
 
@@ -93,7 +92,7 @@ bool OnenetOta::CheckTask() {
     }
 
     std::string data = http->ReadAll();
-    ESP_LOGE(TAG, "GetRequest: %s", data.c_str());
+    ESP_LOGD(TAG, "GetRequest: %s", data.c_str());
     http->Close();
 
     /*
@@ -129,12 +128,12 @@ bool OnenetOta::CheckTask() {
     cJSON *code = cJSON_GetObjectItem(root, "code");
     cJSON *msg = cJSON_GetObjectItem(root, "msg");
     if (cJSON_IsString(msg)) {
-        ESP_LOGE(TAG, "CheckTask, msg: %s", msg->valuestring);
+        ESP_LOGI(TAG, "CheckTask, msg: %s", msg->valuestring);
     }
     // code为0才是有升级任务
     if (cJSON_IsNumber(code)) {
         if (code->valueint != 0) {
-            ESP_LOGE(TAG, "No OTA task, code: %d", code->valueint);
+            ESP_LOGI(TAG, "No OTA task, code: %d", code->valueint);
             return false;
         } else {
             has_ota_task_ = true;
@@ -159,7 +158,7 @@ bool OnenetOta::CheckTask() {
         if (cJSON_IsString(md5)) {
             target_md5_ = md5->valuestring;
         }
-        ESP_LOGE(TAG, "OtaTask, target_version: %s, tid: %s, target_size: %d, target_md5: %s", target_version_.c_str(), tid_.c_str(), target_size_, target_md5_.c_str());
+        ESP_LOGI(TAG, "OtaTask, target_version: %s, tid: %s, target_size: %d, target_md5: %s", target_version_.c_str(), tid_.c_str(), target_size_, target_md5_.c_str());
     }
 
     return true;
@@ -185,7 +184,7 @@ bool OnenetOta::ReportStatus(int32_t status) {
     }
 
     data = http->ReadAll();
-    ESP_LOGE(TAG, "GetRequest: %s", data.c_str());
+    ESP_LOGD(TAG, "GetRequest: %s", data.c_str());
     http->Close();
 
     return true;
@@ -193,7 +192,7 @@ bool OnenetOta::ReportStatus(int32_t status) {
 
 bool OnenetOta::Upgrade(std::function<void(int progress, size_t speed)> callback) {
     if (!has_ota_task_) {
-        ESP_LOGE(TAG, "No OTA task");
+        ESP_LOGI(TAG, "No OTA task");
         return false;
     }
 

@@ -102,6 +102,7 @@ void Application::CheckNewVersion(Ota& ota) {
         retry_count = 0;
         retry_delay = 10; // 重置重试延迟时间
 
+# if 0  // 屏蔽小智官方OTA服务
         if (ota.HasNewVersion()) {
             Alert(Lang::Strings::OTA_UPGRADE, Lang::Strings::UPGRADING, "happy", Lang::Sounds::OGG_UPGRADE);
 
@@ -142,6 +143,7 @@ void Application::CheckNewVersion(Ota& ota) {
                 return; // This line will never be reached after reboot
             }
         }
+#endif
 
         // No new version, mark the current version as valid
         ota.MarkCurrentVersionValid();
@@ -228,6 +230,7 @@ void Application::OnenetCheckNewVersion(OnenetOta& onenet_ota) {
                 return; // This line will never be reached after reboot
             }
         }
+        break;
     }
 }
 
