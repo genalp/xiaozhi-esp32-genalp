@@ -95,9 +95,16 @@ private:
             app.ToggleChatState();
         });
         boot_button_.OnDoubleClick([this]() {
-            auto& app = Application::GetInstance();
-            if (app.GetDeviceState() == kDeviceStateStarting || app.GetDeviceState() == kDeviceStateWifiConfiguring) {
-                SwitchNetworkType();
+            // auto& app = Application::GetInstance();
+            // if (app.GetDeviceState() == kDeviceStateStarting || app.GetDeviceState() == kDeviceStateWifiConfiguring) {
+            //     SwitchNetworkType();
+            // }
+            SwitchNetworkType();
+        });
+        boot_button_.OnLongPress([this]() {
+            if (GetNetworkType() == NetworkType::WIFI) {
+                auto& wifi_board = static_cast<WifiBoard&>(GetCurrentBoard());
+                wifi_board.ResetWifiConfiguration();
             }
         });
 

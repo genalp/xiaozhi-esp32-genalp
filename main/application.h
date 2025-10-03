@@ -14,6 +14,7 @@
 
 #include "protocol.h"
 #include "ota.h"
+#include "onenet_ota.h"
 #include "audio_service.h"
 #include "device_state_event.h"
 
@@ -83,6 +84,7 @@ private:
 
     void OnWakeWordDetected();
     void CheckNewVersion(Ota& ota);
+    void OnenetCheckNewVersion(OnenetOta& onenet_ota);
     void ShowActivationCode(const std::string& code, const std::string& message);
     void OnClockTimer();
     void SetListeningMode(ListeningMode mode);
