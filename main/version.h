@@ -3,6 +3,6 @@
 
 #include <string>
 
-#define APP_VERSION "0.0.2"
+#define APP_VERSION "0.0.9"
 
 #endif // _VERSION_H_
