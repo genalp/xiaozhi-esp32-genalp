@@ -34,6 +34,7 @@ protected:
     lv_obj_t* container_ = nullptr;
     lv_obj_t* side_bar_ = nullptr;
     lv_obj_t* preview_image_ = nullptr;
+    lv_obj_t* custom_emotion_img_ = nullptr;
 
     DisplayFonts fonts_;
     ThemeColors current_theme_;

@@ -10,6 +10,7 @@
 #include "assets/lang_config.h"
 #include <cstring>
 #include "settings.h"
+#include "custom_images.h"
 
 #include "board.h"
 
@@ -282,6 +283,10 @@ LcdDisplay::~LcdDisplay() {
     }
     if (container_ != nullptr) {
         lv_obj_del(container_);
+    }
+    if (custom_emotion_img_ != nullptr) {
+        lv_obj_del(custom_emotion_img_);
+        custom_emotion_img_ = nullptr;
     }
     if (display_ != nullptr) {
         lv_display_delete(display_);
@@ -873,13 +878,41 @@ void LcdDisplay::SetEmotion(const char* emotion) {
         return;
     }
 
-    // 如果找到匹配的表情就显示对应图标，否则显示默认的neutral表情
-    lv_obj_set_style_text_font(emotion_label_, fonts_.emoji_font, 0);
-    if (it != emotions.end()) {
-        lv_label_set_text(emotion_label_, it->icon);
+    // 特殊处理neutral表情，显示自定义图片
+    if (it != emotions.end() && strcmp(it->text, "neutral") == 0) {
+        ESP_LOGE(TAG, "Enter neutral");
+        lv_label_set_text(emotion_label_, "");
+
+        // 如果之前没有创建图片对象，则创建一个
+        if (custom_emotion_img_ == nullptr) {
+            custom_emotion_img_ = lv_img_create(lv_obj_get_parent(emotion_label_));
+            // 设置图片位置与原表情标签相同
+            lv_obj_align_to(custom_emotion_img_, emotion_label_, LV_ALIGN_CENTER, 0, 0);
+        }
+        
+        // 显示自定义图片
+        lv_img_set_src(custom_emotion_img_, &neutral_img);
+        lv_obj_clear_flag(custom_emotion_img_, LV_OBJ_FLAG_HIDDEN);
+        return;
     } else {
-        lv_label_set_text(emotion_label_, "😶");
+        ESP_LOGE(TAG, "Other: %s", emotion);
+        // 处理其他表情
+        // 如果找到匹配的表情就显示对应图标，否则显示默认的neutral表情
+        lv_obj_set_style_text_font(emotion_label_, fonts_.emoji_font, 0);
+        if (it != emotions.end()) {
+            lv_label_set_text(emotion_label_, it->icon);
+        } else {
+            lv_label_set_text(emotion_label_, FONT_AWESOME_EMOJI_NEUTRAL);
+        }
     }
+
+    // // 如果找到匹配的表情就显示对应图标，否则显示默认的neutral表情
+    // lv_obj_set_style_text_font(emotion_label_, fonts_.emoji_font, 0);
+    // if (it != emotions.end()) {
+    //     lv_label_set_text(emotion_label_, it->icon);
+    // } else {
+    //     lv_label_set_text(emotion_label_, "😶");
+    // }
 
 #if !CONFIG_USE_WECHAT_MESSAGE_STYLE
     // 显示emotion_label_，隐藏preview_image_
